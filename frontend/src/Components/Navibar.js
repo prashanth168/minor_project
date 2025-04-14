@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Container, Nav, Navbar, Button } from 'react-bootstrap';
 import { FaUserCircle } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import Features from './Features';
+
 
 function Navibar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);

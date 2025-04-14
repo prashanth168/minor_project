@@ -1,29 +1,47 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../Components/userSlice'; // adjust path if needed
 
 function Login() {
   const { register, handleSubmit } = useForm();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [userRole, setUserRole] = useState('');
 
-  const onLoginSubmit = (userObj) => {
+  const handleRoleChange = (e) => {
+    setUserRole(e.target.value);
+  };
+
+  const onLoginSubmit = async (userObj) => {
     if (!userRole) {
       alert('Please select a role before logging in.');
       return;
     }
 
-    // Simulate login success
-    alert(`Login successful as ${userRole}!`);
-    console.log('User login details:', { ...userObj, role: userRole });
+    try {
+      const response = await fetch('http://localhost:4000/userapi/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ...userObj, role: userRole }),
+      });
 
-    // Navigate to a role-specific dashboard if desired
-    // For now, just navigating to a common /dashboard
-    navigate('/dashboard');
-  };
+      const data = await response.json();
 
-  const handleRoleChange = (e) => {
-    setUserRole(e.target.value);
+      if (response.ok) {
+        alert(`Login successful as ${userRole}!`);
+        dispatch(setUser({ username: data.username, role: userRole, token: data.token }));
+        navigate('/dashboard');
+      } else {
+        alert(`Login failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      alert('Something went wrong. Please try again later.');
+    }
   };
 
   return (
@@ -31,7 +49,6 @@ function Login() {
       <div className='card shadow-lg p-4' style={{ maxWidth: '500px', margin: 'auto', borderRadius: '20px' }}>
         <h3 className='text-center mb-4 text-primary'>Login</h3>
 
-        {/* Role Selection */}
         <div className='mb-3'>
           <label className='form-label'>Login As</label>
           <select className='form-select' onChange={handleRoleChange} value={userRole} required>

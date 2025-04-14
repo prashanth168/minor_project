@@ -10,18 +10,56 @@ function Registration() {
   const handleUserTypeChange = (e) => {
     setUserType(e.target.value);
   };
-
-  const handleFormSubmit = (userObj) => {
-    alert('Form submitted successfully!');
-    navigate('/signin');
+  const handleFormSubmit = async (userObj) => {
+    if (!userType) {
+      alert("Please select a user type.");
+      return;
+    }
+  
+    userObj.role = userType;
+  
+    // Keep username untouched — backend needs it
+    // userObj.name = userObj.username;  // Optional
+    // delete userObj.username;          // ❌ Don't do this
+  
+    if (userType === 'admin') {
+      if (userObj.password !== userObj.confirmPassword) {
+        alert("Passwords do not match!");
+        return;
+      }
+      delete userObj.confirmPassword;
+    }
+  
+    try {
+      const response = await fetch('http://localhost:4000/userapi/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userObj),
+      });
+  
+      const data = await response.json();
+  
+      if (response.ok) {
+        alert('Registration successful!');
+        navigate('/signin');
+      } else {
+        alert(`Registration failed: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+      alert('Something went wrong. Please try again later.');
+    }
   };
-
+  
+  
+  
   return (
     <div className='container mt-5'>
       <div className='card shadow-lg p-4' style={{ maxWidth: '600px', margin: 'auto', borderRadius: '20px' }}>
         <h3 className='text-center mb-4 text-primary'>Registration Form</h3>
 
-        {/* User Type */}
         <div className='mb-3'>
           <label className='form-label'>Register As</label>
           <select className='form-select' onChange={handleUserTypeChange} value={userType} required>

@@ -18,7 +18,9 @@ function Registration() {
   
     userObj.role = userType;
   
-    
+    // Keep username untouched — backend needs it
+    // userObj.name = userObj.username;  // Optional
+    // delete userObj.username;          // ❌ Don't do this
   
     if (userType === 'admin') {
       if (userObj.password !== userObj.confirmPassword) {

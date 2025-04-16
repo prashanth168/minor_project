@@ -6,6 +6,8 @@ import HomeContent from './Components/HomeContent';
 import Features from './Components/Features';
 import About from './Components/About';
 import Contact from './Components/Contact';
+import Dashboard from './Components/Dashboard';
+import Symptom from './SymptomChecker/Symptom';
 function App() {
   let Router=createBrowserRouter([
     {
@@ -34,9 +36,19 @@ function App() {
         {
           path:'/contact',
           element:<Contact/>
+        },
+        {
+          path:'/dashboard',
+          element:<Dashboard/>,
+
         }
+        
 
       ]
+    },
+    {
+      path:'/symptom-checker',
+      element:<Symptom/>
     }
   ])
   return (

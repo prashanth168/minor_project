@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
-import { Container, Nav, Navbar, Button } from 'react-bootstrap';
+import React from 'react';
+import { Container, Nav, Navbar } from 'react-bootstrap';
 import { FaUserCircle } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
-
+import { Link, useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 function Navibar() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.user); // assuming your slice is named `user`
+
+  const handleProfileClick = () => {
+    navigate('/dashboard');
+  };
 
   return (
     <Navbar bg="primary" variant="dark" expand="lg" className="py-3">
@@ -26,8 +31,14 @@ function Navibar() {
         </Nav>
 
         <div>
-          {isLoggedIn ? (
-            <FaUserCircle size={28} color="white" />
+          {user && user.token ? (
+            <FaUserCircle
+              size={28}
+              color="white"
+              role="button"
+              onClick={handleProfileClick}
+              title="Go to Dashboard"
+            />
           ) : (
             <>
               <Link to="/signin" className="btn btn-outline-light me-2">Login</Link>

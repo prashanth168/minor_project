@@ -20,7 +20,7 @@ app.add_middleware(
 )
 
 # Load model and class names
-model = load_model(r"D:\image-generator\model\final_skin_disease_model.keras")
+model = load_model(r"C:\Users\adhar\OneDrive\Desktop\minor\minor_project\Skin_disease_detection_backend-main\best_model.keras")
 class_names = [
     'Acne And Rosacea Photos','Actinic Keratosis Basal Cell Carcinoma And Other Malignant Lesions','Atopic Dermatitis Photos',
     'Ba Cellulitis','Ba Impetigo','Benign','Bullous Disease Photos','Cellulitis Impetigo And Other Bacterial Infections',

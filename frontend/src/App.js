@@ -8,7 +8,6 @@ import About from './Components/About';
 import Contact from './Components/Contact';
 import Dashboard from './Components/Dashboard';
 import Symptom from './SymptomChecker/Symptom';
-import UploadForm from './Components/UploadForm';
 function App() {
   let Router=createBrowserRouter([
     {
@@ -50,10 +49,6 @@ function App() {
     {
       path:'/symptom-checker',
       element:<Symptom/>
-    },
-    {
-      path : '/image-detection',
-      element : <UploadForm/>
     }
   ])
   return (

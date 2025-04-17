@@ -20,7 +20,7 @@ function Dashboard() {
       title: 'Skin disease detection',
       description: 'Quickly upload images to get instant AI-powered health insights.',
       route: '/image-detection',
-      img: '/assets/skin-detection.png',
+      icon: <FaDiagnoses size={40} color="#28A745" />,
     },
     {
       title: 'Hospital Finder',

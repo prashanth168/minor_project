@@ -19,7 +19,7 @@ function Dashboard() {
     {
       title: 'Skin disease detection',
       description: 'Quickly upload images to get instant AI-powered health insights.',
-    //   route: '/skin-disease-detection',
+      route: '/image-detection',
       img: '/assets/skin-detection.png',
     },
     {

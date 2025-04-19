@@ -8,7 +8,8 @@ module.exports = function ({
   patientCollection,
   doctorCollection,
   adminCollection,
-  predictionHistoryCollection
+  predictionHistoryCollection,
+  appointmentCollection // Add appointment collection here
 }) {
   const userRouter = express.Router();
 
@@ -122,6 +123,55 @@ module.exports = function ({
     } catch (err) {
       console.error('Error saving prediction:', err);
       res.status(500).json({ message: 'Error saving prediction', error: err.message });
+    }
+  });
+
+  // === BOOK APPOINTMENT ===
+  userRouter.post('/book-appointment', async (req, res) => {
+    try {
+      const {
+        name,
+        email,
+        date,
+        time,
+        disease,
+        symptoms,
+        doctorId
+      } = req.body;
+
+      if ( !name||!email||!date || !time || !disease || !doctorId) {
+        return res.status(400).json({ message: 'Missing required fields' });
+      }
+
+      const appointment = {
+        name,
+        email,
+        date,
+        time,
+        disease,
+        symptoms: symptoms || "", // optional field
+        doctorId,
+      };
+
+      await appointmentCollection.insertOne(appointment);
+
+      res.status(201).json({ message: 'Appointment booked successfully' });
+    } catch (err) {
+      console.error('Error booking appointment:', err);
+      res.status(500).json({ message: 'Server error while booking appointment', error: err.message });
+    }
+  });
+
+  // === GET APPOINTMENTS FOR A DOCTOR ===
+  userRouter.get('/appointments/:doctorId', async (req, res) => {
+    const { doctorId } = req.params;
+
+    try {
+      const appointments = await appointmentCollection.find({ doctorId }).toArray();
+      res.status(200).json(appointments);
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      res.status(500).json({ message: 'Error fetching appointments', error: err.message });
     }
   });
 

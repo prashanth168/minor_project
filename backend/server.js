@@ -31,21 +31,17 @@ async function initializeDatabase() {
         const doctorCollection = database.collection('doctorCollection');
         const adminCollection = database.collection('adminCollection');
         const predictionHistoryCollection = database.collection('predictionHistoryCollection');
+        const appointmentCollection = database.collection('appointmentCollection'); // Appointment collection
 
-
-
-        // Registration API route
-        
-    const userapi = require('./Apis/userapi')({ patientCollection, doctorCollection, adminCollection ,predictionHistoryCollection});
-    app.use('/userapi', userapi);
-
-        // // Serve static files from React frontend build
-        // app.use(express.static(path.join(__dirname, '../frontend/build')));
-
-        // Serve the React app for any unknown route
-        // app.get('*', (req, res) => {
-        //     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
-        // });
+        // Import and set up the API routes
+        const userapi = require('./Apis/userapi')({ 
+            patientCollection, 
+            doctorCollection, 
+            adminCollection,
+            predictionHistoryCollection,
+            appointmentCollection // Pass the appointment collection here
+        });
+        app.use('/userapi', userapi);
 
         // Start the server
         app.listen(port, () => console.log(`Server is running on port ${port}...`));

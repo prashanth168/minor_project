@@ -72,14 +72,14 @@
 .feature-cards{
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 2.5rem;
   justify-content: center;
 }
 
 
 .feature-card {
-  width: 35vw;
-  height: 22rem;
+  width: 28rem;
+  height: 20rem;
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9ff;

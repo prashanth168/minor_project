@@ -72,14 +72,14 @@
 .feature-cards{
   display: flex;
   flex-wrap: wrap;
-  gap: 2rem;
+  gap: 2.5rem;
   justify-content: center;
 }
 
 
 .feature-card {
-  width: 35vw;
-  height: 22rem;
+  width: 28rem;
+  height: 20rem;
   justify-content: space-between;
   align-items: center;
   background-color: #f9f9ff;
@@ -176,8 +176,8 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 10rem);
-  grid-template-rows: repeat(4, 5rem);
+  grid-template-columns: repeat(3, 15rem);
+  grid-template-rows: repeat(4, 6rem);
   row-gap: 2rem;
   padding: 0.5rem;
 }

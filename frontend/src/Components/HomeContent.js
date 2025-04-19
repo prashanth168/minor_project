@@ -1,99 +1,169 @@
 import React from 'react';
-import './HomeContent.css'; 
+import './HomeContent.css';
+import { useRef } from 'react';
+import emailjs from '@emailjs/browser';
+import { useNavigate } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast';
+import { ReactComponent as Logo } from '../assets/undraw_medicine_hqqg.svg';
+import { ReactComponent as AI } from '../assets/undraw_artificial-intelligence_fuvd.svg';
+import { ReactComponent as Upload } from '../assets/undraw_upload_cucu.svg';
+import { ReactComponent as Location } from '../assets/undraw_location-tracking_q3yd.svg';
+import { ReactComponent as Notify } from '../assets/undraw_notify_rnwe.svg';
+import { ReactComponent as Steps } from '../assets/undraw_steps_s8km.svg';
+import Flow_diagram from '../assets/flow diagram.png';
+
 
 function HomeContent() {
-  return (
-    <div className="container mt-5">
 
+  const navigate = useNavigate();
+
+  const handleLogin = () => {
+    navigate('/signin');
+  };
+
+  const form = useRef();
+
+  const sendEmail = (e) => {
+    e.preventDefault();
+  
+    toast.promise(
+      emailjs.sendForm(
+        'service_jojkpig',
+        'template_9vnkjwr',
+        form.current,
+        'Vo7wqh7oG1HOjMhv2'
+      ),
+      {
+        loading: 'Sending message...',
+        success: '📨 Message Sent Successfully!',
+        error: (err) => `❌ Failed to send: ${err.text}`,
+      }
+    ).then(() => form.current.reset());
+  };
+    
+
+  return (
+    <div className="home-container">
+      <Toaster position="top-right" reverseOrder={false} />
       {/* Hero Section */}
-      <div className="text-center mb-5">
-        <h1 className="fw-bold">HealthMate</h1>
-        <p className="lead">Your Health, Our AI-Powered Assistant</p>
-        <div className="d-flex justify-content-center gap-3 mt-3">
-          <button className="btn btn-primary">Get Started</button>
+      <section id="hero" className="hero">
+        <h1>HealthMate</h1>
+        <p>Your Health. Our AI. Instant Answers.</p>
+        <button className="btn-get-started" onClick={handleLogin}>Get Started</button>
+
+        <div className='intro'>
+          <span className='intro-text'>Check symptoms, detect wounds with a photo, and find the nearest hospital — all in one smart healthcare assistant. <br />
+            <button className="btn-get-started" onClick={handleLogin}>Scan Now</button>
+            &emsp;
+            <button className="btn-get-started" onClick={handleLogin}>Check with symptoms</button>
+          </span>
+          <Logo width="35rem" height="25rem" />
         </div>
-      </div>
+
+      </section>
 
       {/* Highlights Section */}
-      <div className="text-center mb-5">
-        <h4 className="mb-4">Highlights</h4>
-        <div className="row g-4">
-          <div className="col-md-6">
-            <div className="card h-100 p-3">
-              <h5 className="card-title">AI Symptom Checker</h5>
-              <p className="card-text">Enter symptoms, get quick AI-based diagnosis with suggested steps.</p>
+      <section id="features" className="features">
+        <h2>Highlights</h2>
+        <div className="feature-cards">
+          <div className="feature-card">
+            <h1>Check Now</h1>
+            <div className="text-content">
+              <h3>AI Symptom Checker</h3> <br />
+              <p>Enter symptoms, get quick AI-based diagnosis with suggested steps.</p>
+            </div>
+            <AI className="logo" width="5rem" />
+          </div>
+
+          <div className="feature-card">
+            <h1>Scan Now</h1>
+            <div className='text-content'>
+              <h3>Skin Disease Detection</h3> <br />
+              <p>Upload an image to get an AI-based prediction of the disease type.</p>
+              <Upload className="logo" width="20rem" />
             </div>
           </div>
-          <div className="col-md-6">
-            <div className="card h-100 p-3">
-              <h5 className="card-title">Skin Disease Detection</h5>
-              <p className="card-text">Upload a image to get an AI-based prediction of the disease type.</p>
+          <div className="feature-card">
+            <h1>Find Now</h1>
+            <div className='text-content'>
+              <h3>Hospital/Clinic Finder</h3> <br />
+              <p>Find the nearest hospital or clinic based on your current location.</p>
             </div>
+            <Location className="logo" width="20rem" />
           </div>
-          <div className="col-md-6">
-            <div className="card h-100 p-3">
-              <h5 className="card-title">Hospital/Clinic Finder</h5>
-              <p className="card-text">Find the nearest hospital or clinic based on your current location.</p>
+          <div className="feature-card">
+            <h1>Check Now</h1>
+            <div className='text-content'>
+              <h3>Smart Health Alerts</h3> <br />
+              <p>Get real-time alerts on health trends, outbreaks, or health tips.</p>
             </div>
-          </div>
-          <div className="col-md-6">
-            <div className="card h-100 p-3">
-              <h5 className="card-title">Smart Health Alerts</h5>
-              <p className="card-text">Get real-time alerts on health trends, outbreaks, or health tips.</p>
-            </div>
+            <Notify className="logo" width="10rem" />
           </div>
         </div>
-      </div>
+      </section>
 
       {/* How It Works */}
-      <div className="text-center mb-5">
-        <h4 className="mb-4">How it works</h4>
-        <p className="text-muted">1. Choose service → 2. Input info → 3. Get AI result → 4. Follow guidance</p>
-        {/* Replace below with images or icons if needed */}
-      </div>
+      <section className="how-it-works">
+        <h2>How it Works</h2>
+        <div>
+          <Steps height="25rem" width="25rem" />
+          <img src={Flow_diagram} alt='flow diagram' height="450rem" width="300rem" />
+        </div>
+      </section>
 
       {/* Why Us */}
-      <div className="text-center mb-5">
-        <h4 className="mb-4">Why us?</h4>
-        <div className="d-flex flex-wrap justify-content-center gap-3">
-          <span className="badge bg-primary p-3 fs-6">Affordable</span>
-          <span className="badge bg-secondary p-3 fs-6">Private & Secure</span>
-          <span className="badge bg-success p-3 fs-6">Fast & Simple</span>
-          <span className="badge bg-info text-dark p-3 fs-6">AI-Powered Accuracy</span>
+      <section className="why-us">
+        <h2>Why us ?</h2>
+        <div className='container'>
+        <div class="grid-container">
+          <div class="grid-item combined"><p>Available 24/7</p></div>
+          <div class="grid-item-unwanted"></div>
+          <div class="grid-item combined"><p>Fast, Simple & Free</p></div>
+
+          <div class="grid-item combined"><p>Built by Experts with<br/> Medical Datasets</p></div>
+
+          <div class="grid-item combined"><p>Private & Secure</p></div>
+          <div class="grid-item combined"><p>AI-Powered Accuracy</p></div>
+
+          <div class="grid-item-unwanted"></div>
+
         </div>
-      </div>
+        </div>
+      </section>
+
 
       {/* About Us */}
-      <div className="text-center mb-5">
-        <h4 className="mb-3">About Us</h4>
-        <p className="text-muted px-md-5">
-          At <strong>HealthMate</strong>, our goal is to offer fast, accessible, and accurate AI-powered healthcare solutions.
-          Whether it's detecting symptoms, scanning wounds, or finding nearby medical help, HealthMate
-          combines cutting-edge AI with real-world needs for better health outcomes.
-        </p>
-      </div>
+      <section id="about" className="about-us">
+        <h2>About Us</h2>
+        <p>
+        At <strong>HealthMate</strong>, we're driven by a mission to make healthcare smarter, more accessible, and patient-friendly. Our platform integrates cutting-edge AI technology with essential hospital services to simplify the healthcare journey for everyone.<br/><br/>
 
-      {/* Contact Form */}
-      <div className="bg-light p-4 rounded">
-        <h4 className="text-center mb-4">Contact us</h4>
-        <form>
-          <div className="mb-3">
-            <label htmlFor="name" className="form-label">Name</label>
-            <input type="text" className="form-control" id="name" placeholder="Your name" />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="email" className="form-label">Email</label>
-            <input type="email" className="form-control" id="email" placeholder="your@email.com" />
-          </div>
-          <div className="mb-3">
-            <label htmlFor="message" className="form-label">Message</label>
-            <textarea className="form-control" id="message" rows="3" placeholder="Your message"></textarea>
-          </div>
-          <div className="text-center">
-            <button type="submit" className="btn btn-primary">Contact us</button>
-          </div>
-        </form>
-      </div>
+We specialize in AI-based wound and disease detection, affordability-based hospital recommendations, and insurance compatibility checks all designed to empower users with timely, accurate, and personalized healthcare insights.<br/><br/>
+
+Whether you're in a city or a remote village, our system ensures that quality care is just a few clicks away. With features like appointment booking, smart reminders, and medical records tracking, we're helping patients take control of their health like never before.<br/><br/>
+
+<strong>Join us in building a healthier future where technology meets compassion.</strong>
+        </p>
+      </section>
+
+      <section id="contact" className="contact">
+      <h2>Contact us</h2>
+      <form className="contact-form" onSubmit={sendEmail} ref={form}>
+        <div className="form-group">
+          <label htmlFor="name">Name</label>
+          <input name="user_name" type="text" id="name" placeholder="Your name" required />
+        </div>
+        <div className="form-group">
+          <label htmlFor="email">Email</label>
+          <input name="user_email" type="email" id="email" placeholder="your@email.com" required />
+        </div>
+        <div className="form-group">
+          <label htmlFor="message">Message</label>
+          <textarea name="message" id="message" rows="3" placeholder="Your message" required></textarea>
+        </div>
+        <button type="submit" className="btn-submit">Contact us</button>
+      </form>
+    </section>
 
     </div>
   );

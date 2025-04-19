@@ -1,0 +1,89 @@
+.navibar {
+    background-color: #4f46e5; /* indigo-700 */
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000; 
+
+  }
+  
+  .nav-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: auto;
+    padding: 0 24px;
+  }
+  
+  .nav-brand {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+  }
+  
+  .nav-logo {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+  }
+  
+  .nav-title {
+    color: white;
+    font-size: 1.9rem;
+    font-weight: bold;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 30px;
+  }
+  
+  .nav-link {
+    color: #d0cef1 !important;
+    text-decoration: none;
+    font-size: 0.9rem;
+  }
+  
+  .nav-link:hover {
+    color: #ffffff !important;
+  }
+  
+  .nav-actions {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  
+  .btn-login,
+  .btn-register {
+    padding: 6px 20px 8px 20px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    transition: 0.3s ease;
+  }
+  
+  .btn-login {
+    border: 1px solid white;
+    color: white;
+  }
+  
+  .btn-login:hover {
+    background-color: white;
+    color: #4f46e5;
+  }
+  
+  .btn-register {
+    background-color: #f97316; /* orange-500 */
+    color: white;
+  }
+  
+  .btn-register:hover {
+    background-color: #ea580c; /* orange-600 */
+  }
+  
+  .profile-icon {
+    color: white;
+    cursor: pointer;
+  }

@@ -1,53 +1,50 @@
 import React from 'react';
-import { Container, Nav, Navbar } from 'react-bootstrap';
-import { FaUserCircle } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { FaUserCircle } from 'react-icons/fa';
+import './Navibar.css';
 
 function Navibar() {
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user); // assuming your slice is named `user`
+  const user = useSelector((state) => state.user);
 
   const handleProfileClick = () => {
     navigate('/dashboard');
   };
 
   return (
-    <Navbar bg="primary" variant="dark" expand="lg" className="py-3">
-      <Container fluid className="d-flex justify-content-between align-items-center">
-        <Navbar.Brand as={Link} to="/" className="d-flex align-items-center">
-          <img
-            src="https://cdn-icons-png.flaticon.com/512/726/726476.png"
-            alt="Logo"
-            style={{ width: '40px', marginRight: '10px' }}
-          />
-          <span className="fs-4 fw-bold">HealthMate</span>
-        </Navbar.Brand>
+    <nav className="navibar">
+      <div className="nav-container">
+        {/* Logo + Brand */}
+        <a href="/" className="nav-brand">
+          <span className="nav-title">HealthMate</span>
+        </a>
 
-        <Nav className="mx-auto">
-          <Nav.Link as={Link} to="/features">Features</Nav.Link>
-          <Nav.Link as={Link} to="/about">About us</Nav.Link>
-          <Nav.Link as={Link} to="/contact">Contact us</Nav.Link>
-        </Nav>
+        {/* Section Links */}
+        <div className="nav-links">
+          <a href="#features" className="nav-link">Features</a>
+          <a href="#about" className="nav-link">About us</a>
+          <a href="#contact" className="nav-link">Contact us</a>
+        </div>
 
-        <div>
+        {/* Actions */}
+        <div className="nav-actions">
           {user && user.token ? (
             <FaUserCircle
               size={28}
-              color="white"
-              role="button"
-              onClick={handleProfileClick}
+              className="profile-icon"
               title="Go to Dashboard"
+              onClick={handleProfileClick}
             />
           ) : (
             <>
-              <Link to="/signin" className="btn btn-outline-light me-2">Login</Link>
-              <Link to="/signup" className="btn btn-outline-light">Register</Link>
+              <Link to="/signin" className="btn-login">Login</Link>
+              <Link to="/signup" className="btn-register">Register</Link>
             </>
           )}
         </div>
-      </Container>
-    </Navbar>
+      </div>
+    </nav>
   );
 }
 

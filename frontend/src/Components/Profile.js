@@ -8,11 +8,18 @@ function Profile() {
   const user = useSelector((state) => state.user);
   const navigate = useNavigate();
   const [history, setHistory] = useState([]);
+  const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     if (user && user._id && user.role === "patient") {
       axios.get(`http://localhost:5000/history/${user._id}`)
         .then(res => setHistory(res.data))
+        .catch(err => console.error(err));
+    }
+  
+    if (user && user._id && user.role === "doctor") {
+      axios.get(`http://localhost:4000/userapi/appointments/${user._id}`)
+        .then(res => setAppointments(res.data))
         .catch(err => console.error(err));
     }
   }, [user]);
@@ -86,12 +93,55 @@ function Profile() {
           </>
         )}
 
-        {user.role === 'doctor' && (
-          <>
-            <p><strong>Specialization:</strong> {user.specialization}</p>
-            <p><strong>Experience:</strong> {user.experience} years</p>
-          </>
-        )}
+{user.role === 'doctor' && (
+  <>
+    <p><strong>Specialization:</strong> {user.specialization}</p>
+    <p><strong>Experience:</strong> {user.experience} years</p>
+
+    <hr />
+    <h5 className="mt-4 text-center text-success">📅 Appointments Booked</h5>
+
+    {appointments.length === 0 ? (
+      <p className="text-muted text-center">No appointments booked yet.</p>
+    ) : (
+      <div className="mt-3">
+        {appointments.map((appt, index) => (
+          <div
+            key={index}
+            className="card mb-3 shadow-sm border-start border-4"
+            style={{
+              borderColor: "#198754",
+              backgroundColor: "#f8f9fa",
+              borderRadius: "15px",
+            }}
+          >
+            <div className="card-body">
+              <h6 className="card-title text-success mb-2">
+                🧑‍🤝‍🧑 Patient: <span className="text-dark">{appt.name}</span>
+              </h6>
+              <p className="card-text mb-1">
+                <strong>📧 Email:</strong> {appt.email}
+              </p>
+              <p className="card-text mb-1">
+                <strong>🦠 Disease:</strong> <span className="text-danger">{appt.disease}</span>
+              </p>
+              {appt.symptoms && (
+                <p className="card-text mb-1">
+                  <strong>📝 Additional Symptoms:</strong> {appt.symptoms}
+                </p>
+              )}
+              <p className="card-text">
+                <strong>🗓 Date:</strong> {appt.date} &nbsp;
+                <strong>🕒 Time:</strong> {appt.time}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </>
+)}
+
       </div>
 
       <button onClick={handleDashboardClick} className="btn btn-primary mt-4">Go to Dashboard</button>

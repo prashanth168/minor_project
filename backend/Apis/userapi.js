@@ -4,7 +4,12 @@ const jwt = require('jsonwebtoken');
 
 const secretKey = process.env.SECRET_KEY || 'your_default_secret_key';
 
-module.exports = function ({ patientCollection, doctorCollection, adminCollection }) {
+module.exports = function ({
+  patientCollection,
+  doctorCollection,
+  adminCollection,
+  predictionHistoryCollection
+}) {
   const userRouter = express.Router();
 
   // === ROLE-BASED REGISTRATION ===
@@ -15,22 +20,17 @@ module.exports = function ({ patientCollection, doctorCollection, adminCollectio
     try {
       let collection;
 
-      // Assign collection based on role
       if (role === 'patient') collection = patientCollection;
       else if (role === 'doctor') collection = doctorCollection;
       else if (role === 'admin') collection = adminCollection;
       else return res.status(400).json({ message: 'Invalid role provided' });
 
-      // Check for existing user by username
       const existingUser = await collection.findOne({ username });
       if (existingUser) {
         return res.status(400).json({ message: 'User already exists with this username.' });
       }
 
-      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
-
-      // Save user
       const result = await collection.insertOne({
         ...userData,
         password: hashedPassword
@@ -50,40 +50,95 @@ module.exports = function ({ patientCollection, doctorCollection, adminCollectio
     try {
       let collection;
 
-      // Assign collection based on role
       if (role === 'patient') collection = patientCollection;
       else if (role === 'doctor') collection = doctorCollection;
       else if (role === 'admin') collection = adminCollection;
       else return res.status(400).json({ message: 'Invalid role provided' });
 
-      // Find user by username and role
       const user = await collection.findOne({ username });
       if (!user) {
         return res.status(400).json({ message: 'Invalid username or password' });
       }
 
-      // Validate password
       const isValidPassword = await bcrypt.compare(password, user.password);
       if (!isValidPassword) {
         return res.status(400).json({ message: 'Invalid username or password' });
       }
 
-      // Generate token
       const token = jwt.sign(
         { userId: user._id, username: user.username, role },
         secretKey,
         { expiresIn: '1h' }
       );
 
+      const { password: _, ...userWithoutPassword } = user;
+
       res.status(200).json({
         message: 'Login successful',
         token,
-        username: user.username,
-        role
+        ...userWithoutPassword
       });
     } catch (error) {
       console.error('Login error:', error);
       res.status(500).json({ message: 'Login failed', error: error.message });
+    }
+  });
+
+  // === FETCH DOCTORS ROUTE ===
+  userRouter.get('/doctors', async (req, res) => {
+    try {
+      const doctors = await doctorCollection.find().toArray();
+      if (doctors.length === 0) {
+        return res.status(404).json({ message: 'No doctors found' });
+      }
+
+      res.status(200).json({ message: 'Doctors fetched successfully', data: doctors });
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+      res.status(500).json({ message: 'Error fetching doctors', error: error.message });
+    }
+  });
+
+  // === SAVE PREDICTION HISTORY ===
+  userRouter.post('/save-prediction', async (req, res) => {
+    const { userId, symptoms, disease, description, precautions, specialist } = req.body;
+
+    if (!userId || !symptoms || !disease) {
+      return res.status(400).json({ message: 'Missing required fields' });
+    }
+
+    try {
+      await predictionHistoryCollection.insertOne({
+        userId,
+        symptoms,
+        disease,
+        description,
+        precautions,
+        specialist,
+        timestamp: new Date()
+      });
+
+      res.status(200).json({ message: 'Prediction saved successfully' });
+    } catch (err) {
+      console.error('Error saving prediction:', err);
+      res.status(500).json({ message: 'Error saving prediction', error: err.message });
+    }
+  });
+
+  // === GET USER PREDICTION HISTORY ===
+  userRouter.get('/get-history/:userId', async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const history = await predictionHistoryCollection
+        .find({ userId })
+        .sort({ timestamp: -1 })
+        .toArray();
+
+      res.status(200).json({ message: 'History fetched', data: history });
+    } catch (err) {
+      console.error('Error fetching history:', err);
+      res.status(500).json({ message: 'Error fetching history', error: err.message });
     }
   });
 

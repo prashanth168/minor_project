@@ -30,11 +30,13 @@ async function initializeDatabase() {
         const patientCollection = database.collection('patientCollection');
         const doctorCollection = database.collection('doctorCollection');
         const adminCollection = database.collection('adminCollection');
+        const predictionHistoryCollection = database.collection('predictionHistoryCollection');
+
 
 
         // Registration API route
         
-    const userapi = require('./Apis/userapi')({ patientCollection, doctorCollection, adminCollection });
+    const userapi = require('./Apis/userapi')({ patientCollection, doctorCollection, adminCollection ,predictionHistoryCollection});
     app.use('/userapi', userapi);
 
         // // Serve static files from React frontend build

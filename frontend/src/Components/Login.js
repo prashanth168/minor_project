@@ -28,12 +28,28 @@ function Login() {
         },
         body: JSON.stringify({ ...userObj, role: userRole }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
         alert(`Login successful as ${userRole}!`);
-        dispatch(setUser({ username: data.username, role: userRole, token: data.token }));
+        
+        // Store user data in Redux
+        dispatch(setUser({
+          _id: data._id,
+          email: data.email,
+          role: data.role,
+          username: data.username,
+          age: data.age,
+          gender: data.gender,
+          city: data.city,
+          specialization: data.specialization,
+          experience: data.experience,
+          token: data.token
+        }));
+  
+        console.log("User data after dispatch:", data);  // <-- Check this in the console
+  
         navigate('/dashboard');
       } else {
         alert(`Login failed: ${data.message}`);
@@ -43,7 +59,6 @@ function Login() {
       alert('Something went wrong. Please try again later.');
     }
   };
-
   return (
     <div className='container mt-5'>
       <div className='card shadow-lg p-4' style={{ maxWidth: '500px', margin: 'auto', borderRadius: '20px' }}>

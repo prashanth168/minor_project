@@ -9,6 +9,8 @@ import Contact from './Components/Contact';
 import Dashboard from './Components/Dashboard';
 import Symptom from './SymptomChecker/Symptom';
 import UploadForm from './Components/UploadForm';
+import Profile from './Components/Profile';
+import DoctorList from './Components/DoctorList';
 
 
 function App() {
@@ -45,6 +47,10 @@ function App() {
           element:<Dashboard/>,
 
         },
+        {
+          path:'/profile',
+          element:<Profile/>
+        }
         
         
 
@@ -58,7 +64,10 @@ function App() {
       path:'/image-detection',
       element:<UploadForm/>
     },
-    
+    {
+      path:'/hospital-finder',
+      element:<DoctorList/>
+    }
   ])
   return (
     <div className="App">

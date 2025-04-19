@@ -10,18 +10,19 @@ function Registration() {
   const handleUserTypeChange = (e) => {
     setUserType(e.target.value);
   };
+
   const handleFormSubmit = async (userObj) => {
     if (!userType) {
       alert("Please select a user type.");
       return;
     }
-  
+
     userObj.role = userType;
-  
+
     // Keep username untouched — backend needs it
     // userObj.name = userObj.username;  // Optional
     // delete userObj.username;          // ❌ Don't do this
-  
+
     if (userType === 'admin') {
       if (userObj.password !== userObj.confirmPassword) {
         alert("Passwords do not match!");
@@ -29,7 +30,7 @@ function Registration() {
       }
       delete userObj.confirmPassword;
     }
-  
+
     try {
       const response = await fetch('http://localhost:4000/userapi/register', {
         method: 'POST',
@@ -38,9 +39,9 @@ function Registration() {
         },
         body: JSON.stringify(userObj),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert('Registration successful!');
         navigate('/signin');
@@ -52,9 +53,7 @@ function Registration() {
       alert('Something went wrong. Please try again later.');
     }
   };
-  
-  
-  
+
   return (
     <div className='container mt-5'>
       <div className='card shadow-lg p-4' style={{ maxWidth: '600px', margin: 'auto', borderRadius: '20px' }}>
@@ -91,6 +90,11 @@ function Registration() {
           {/* Patient Fields */}
           {userType === 'patient' && (
             <>
+              <div className='mb-3'>
+                <label className='form-label'>Age</label>
+                <input type='number' className='form-control' placeholder='Enter age' {...register('age', { required: true, min: 1 })} />
+              </div>
+
               <div className='mb-3'>
                 <label className='form-label'>Gender</label><br />
                 <div className='form-check form-check-inline'>

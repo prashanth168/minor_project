@@ -1,24 +1,31 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { FaUserCircle } from 'react-icons/fa';
+import { clearUser } from '../Components/userSlice';
 import './Navibar.css';
 
 function Navibar() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
   const handleProfileClick = () => {
-    navigate('/dashboard');
+    navigate('/profile');
+  };
+
+  const handleLogout = () => {
+    dispatch(clearUser());
+    navigate('/signin');
   };
 
   return (
     <nav className="navibar">
       <div className="nav-container">
         {/* Logo + Brand */}
-        <a href="/" className="nav-brand">
+        <Link to="/" className="nav-brand">
           <span className="nav-title">HealthMate</span>
-        </a>
+        </Link>
 
         {/* Section Links */}
         <div className="nav-links">
@@ -27,15 +34,25 @@ function Navibar() {
           <a href="#contact" className="nav-link">Contact us</a>
         </div>
 
-        {/* Actions */}
+        {/* User Actions */}
         <div className="nav-actions">
           {user && user.token ? (
-            <FaUserCircle
-              size={28}
-              className="profile-icon"
-              title="Go to Dashboard"
-              onClick={handleProfileClick}
-            />
+            <>
+              <FaUserCircle
+                size={28}
+                className="profile-icon me-3"
+                title="Profile"
+                onClick={handleProfileClick}
+                style={{ cursor: 'pointer' }}
+              />
+              <button
+                onClick={handleLogout}
+                className="btn btn-outline-danger btn-sm"
+                style={{ marginLeft: '10px' }}
+              >
+                Logout
+              </button>
+            </>
           ) : (
             <>
               <Link to="/signin" className="btn-login">Login</Link>

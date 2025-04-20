@@ -13,21 +13,29 @@ const Chatbot = () => {
   };
 
   const resetBot = () => {
-    // First, check if Botpress WebChat exists and reset the chat
+    // Try resetting if WebChat is available
     if (window.botpressWebChat) {
-      window.botpressWebChat.reset(); // Reset conversation
+      window.botpressWebChat.sendEvent({ type: 'reset' }); // Recommended way to reset
+    } else {
+      // Retry if not yet loaded
+      setTimeout(() => {
+        if (window.botpressWebChat) {
+          window.botpressWebChat.sendEvent({ type: 'reset' });
+        }
+      }, 500);
     }
 
-    // Hide bot momentarily and then show it to simulate reset
+    // Hide and show the bot to visually refresh UI
     setShowBot(false);
     setTimeout(() => {
-      setShowBot(true); // Show bot again
-      setKey(Date.now()); // Change key to reset iframe
-    }, 300); // Delay for smooth hiding
+      setShowBot(true);
+      setKey(Date.now());
+    }, 300);
   };
 
   return (
     <div>
+      {/* Main Toggle Button */}
       <button 
         style={{
           position: 'fixed',
@@ -54,12 +62,13 @@ const Chatbot = () => {
       {showBot && (
         <button
           onClick={resetBot}
+          title="Reset Chat"
           style={{
             position: 'fixed',
-            bottom: '80px', // Slightly above the main button
+            bottom: '80px',
             right: '20px',
             zIndex: '1001',
-            backgroundColor: '#007bff', // Blue color
+            backgroundColor: '#007bff',
             color: 'white',
             border: 'none',
             padding: '12px',
@@ -71,10 +80,11 @@ const Chatbot = () => {
             boxShadow: '0px 5px 10px rgba(0,0,0,0.1)',
           }}
         >
-          R
+          🔄
         </button>
       )}
 
+      {/* Overlay and iframe */}
       {showBot && (
         <>
           <div

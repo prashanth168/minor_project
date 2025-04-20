@@ -1,0 +1,29 @@
+/* Chatbot.css */
+.chatbot-container {
+    position: fixed;
+    bottom: 20px; /* Adjust as needed */
+    left: 20px; /* Adjust as needed */
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000; /* Ensure it's on top of other elements */
+}
+
+.chatbot-header {
+    background-color: #007bff; /* Change to match your design */
+    color: #fff;
+    padding: 10px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.chatbot-body {
+    background-color: #fff; /* Change to match your design */
+    padding: 10px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    max-width: 300px; /* Adjust as needed */
+    max-height: 400px; /* Adjust as needed */
+    overflow-y: auto; /* Scroll if content exceeds max-height */
+}

@@ -11,7 +11,7 @@ import Symptom from './SymptomChecker/Symptom';
 import UploadForm from './Components/UploadForm';
 import Profile from './Components/Profile';
 import DoctorList from './Components/DoctorList';
-
+import Chatbot from './Chatbot/Chatbot';
 
 function App() {
   let Router=createBrowserRouter([
@@ -72,6 +72,7 @@ function App() {
   return (
     <div className="App">
       <RouterProvider router={Router}></RouterProvider>
+      <Chatbot/>
     </div>
   );
 }
@@ -82,3 +83,6 @@ export default App;
 // import { useSelector } from 'react-redux';
 
 // const { username, role, token } = useSelector((state) => state.user);
+
+
+//https://cdn.botpress.cloud/webchat/v2.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/04/20/03/20250420032859-9VEM68XR.json

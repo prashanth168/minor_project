@@ -43,12 +43,6 @@ const DoctorList = () => {
     setSelectedDoctor(doctor);
     setShowForm(true);
     setApiError('');
-    // Pre-fill form with user data
-    setFormData(prev => ({
-      ...prev,
-      disease: '',
-      symptoms: ''
-    }));
   };
 
   const handleChange = (e) => {
@@ -61,18 +55,15 @@ const DoctorList = () => {
     setApiError('');
 
     try {
-      // Prepare data exactly as backend expects
       const appointmentData = {
-        name: user.username,  // From Redux store
-        email: user.email,    // From Redux store
+        name: user.username,
+        email: user.email,
         date: formData.date,
         time: formData.time,
         disease: formData.disease,
-        symptoms: formData.symptoms || "", // Optional but included
+        symptoms: formData.symptoms || '',
         doctorId: selectedDoctor._id
       };
-
-
 
       const res = await fetch('http://localhost:4000/userapi/book-appointment', {
         method: 'POST',
@@ -80,13 +71,12 @@ const DoctorList = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${user.token}`
         },
-        body: JSON.stringify(appointmentData),
+        body: JSON.stringify(appointmentData)
       });
 
       const data = await res.json();
-
       if (!res.ok) {
-        throw new Error(data.message || 'Failed to book appointment');
+        throw new Error(data.message || 'Booking failed');
       }
 
       alert('Appointment booked successfully!');
@@ -97,14 +87,10 @@ const DoctorList = () => {
         disease: '',
         symptoms: ''
       });
-    } catch (error) {
-
-      setApiError(error.message || 'Failed to book appointment');
+    } catch (err) {
+      setApiError(err.message);
     }
   };
-
-  if (loading) return <div className="loading-spinner">Loading doctors...</div>;
-  if (error) return <div className="error-message">{error}</div>;
 
   return (
     <div className="doctor-list-container">
@@ -135,88 +121,39 @@ const DoctorList = () => {
         ))}
       </div>
 
-      {showForm && (
-        <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="appointment-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="close-btn" onClick={() => setShowForm(false)}>
+      {showForm && selectedDoctor && (
+        <div className="doctor-list-modal-overlay">
+          <div className="doctor-list-appointment-modal">
+            <button className="doctor-list-close-btn" onClick={() => setShowForm(false)}>
               <FaTimes />
             </button>
-            
-            <div className="modal-header">
-              <h3>
-                <FaUserMd className="icon" />
-                Book with Dr. {selectedDoctor?.username}
-              </h3>
-              <p className="specialty">{selectedDoctor?.specialization}</p>
+            <div className="doctor-list-modal-header">
+              <h3><FaUserMd /> Book Appointment with {selectedDoctor.name}</h3>
+              <p className="doctor-list-specialty">{selectedDoctor.specialty}</p>
             </div>
-
-            <div className="patient-info">
-              <p><strong>Patient:</strong> {user.username}</p>
+            <div className="doctor-list-patient-info">
+              <p><strong>Patient Name:</strong> {user.username}</p>
               <p><strong>Email:</strong> {user.email}</p>
             </div>
-
-            {apiError && <div className="error-message">{apiError}</div>}
-
             <form onSubmit={handleSubmit}>
-              <div className="form-group">
-                <label>
-                  <FaCalendarAlt className="icon" />
-                  Appointment Date *
-                </label>
-                <input
-                  type="date"
-                  name="date"
-                  value={formData.date}
-                  onChange={handleChange}
-                  min={new Date().toISOString().split('T')[0]}
-                  required
-                />
+              <div className="doctor-list-form-group">
+                <label><FaCalendarAlt /> Date:</label>
+                <input type="date" name="date" value={formData.date} onChange={handleChange} required />
               </div>
-
-              <div className="form-group">
-                <label>
-                  <FaClock className="icon" />
-                  Appointment Time *
-                </label>
-                <input
-                  type="time"
-                  name="time"
-                  value={formData.time}
-                  onChange={handleChange}
-                  required
-                />
+              <div className="doctor-list-form-group">
+                <label><FaClock /> Time:</label>
+                <input type="time" name="time" value={formData.time} onChange={handleChange} required />
               </div>
-
-              <div className="form-group">
-                <label>
-                  <FaNotesMedical className="icon" />
-                  Medical Concern *
-                </label>
-                <textarea
-                  name="disease"
-                  value={formData.disease}
-                  onChange={handleChange}
-                  placeholder="Describe your primary medical concern"
-                  required
-                />
+              <div className="doctor-list-form-group">
+                <label><FaNotesMedical /> Disease:</label>
+                <input type="text" name="disease" value={formData.disease} onChange={handleChange} required />
               </div>
-
-              <div className="form-group">
-                <label>
-                  <FaNotesMedical className="icon" />
-                  Additional Symptoms
-                </label>
-                <textarea
-                  name="symptoms"
-                  value={formData.symptoms}
-                  onChange={handleChange}
-                  placeholder="Any other symptoms you're experiencing (optional)"
-                />
+              <div className="doctor-list-form-group">
+                <label>Symptoms (optional):</label>
+                <textarea name="symptoms" value={formData.symptoms} onChange={handleChange}></textarea>
               </div>
-
-              <button type="submit" className="submit-btn">
-                Confirm Booking
-              </button>
+              {apiError && <div className="doctor-list-error-message">{apiError}</div>}
+              <button className="doctor-list-submit-btn" type="submit">Submit Appointment</button>
             </form>
           </div>
         </div>

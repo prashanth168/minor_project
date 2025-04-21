@@ -1,5 +1,8 @@
 /* HomeContent.css */
-
+*{
+  padding: 0;
+  margin: 0;
+}
 .home-container {
   max-width: 1140px;
   margin: 0 auto;
@@ -166,6 +169,7 @@
 .container{
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .why-us h2 {

@@ -1,0 +1,29 @@
+.page-container {
+    padding: 20px;
+  }
+  
+  .tab-buttons {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  
+  .tab-buttons button {
+    padding: 10px 20px;
+    margin: 0 5px;
+    background-color: #eee;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .tab-buttons .active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .tab-content {
+    margin-top: 20px;
+  }
+  

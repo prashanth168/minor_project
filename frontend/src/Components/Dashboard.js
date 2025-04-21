@@ -38,7 +38,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard-container">
-      <h2 className="welcome-text">Welcome Back {username}!</h2>
+      <h2 className="welcome-text">👋 Welcome Back {username}!</h2>
       <div className="cards-grid">
         {cards.map((card, idx) => (
           <div

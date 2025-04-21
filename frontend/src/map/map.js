@@ -1,38 +1,56 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Circle, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
   faHospital, faClinicMedical, faPrescriptionBottleAlt, 
   faSearch, faLocationArrow, faSpinner, faChevronLeft, 
-  faChevronRight, faCalendarCheck, faUser, faDirections,
+  faChevronRight, faCalendarCheck, faDirections,
   faCalendarPlus, faMapMarkerAlt, faPhone, faRoute,
   faTimes
 } from '@fortawesome/free-solid-svg-icons';
-import './App.css';
+import './map.css';
 
-// Sample doctor data
-const sampleDoctors = {
-  hospital: [
-    { id: 'doc1', name: 'Dr. Rajesh Kumar', specialty: 'Cardiology', available: true, nextAvailable: 'Tomorrow 10 AM' },
-    { id: 'doc2', name: 'Dr. Priya Sharma', specialty: 'Pediatrics', available: false, nextAvailable: 'Friday 2 PM' },
-    { id: 'doc3', name: 'Dr. Amit Patel', specialty: 'Orthopedics', available: true, nextAvailable: 'Today 4 PM' }
-  ],
-  clinic: [
-    { id: 'doc4', name: 'Dr. Sunita Reddy', specialty: 'General Medicine', available: true, nextAvailable: 'Today 5 PM' },
-    { id: 'doc5', name: 'Dr. Vikram Singh', specialty: 'Dermatology', available: true, nextAvailable: 'Wednesday 11 AM' }
-  ],
-  pharmacy: [
-    { id: 'pharm1', name: 'Pharmacist Available', specialty: 'Medication Consultation', available: true, nextAvailable: 'Now' }
-  ]
-};
-
-// Custom icons
+// Facility type icons
 const facilityIcons = {
   hospital: { icon: faHospital, color: '#2980b9' },
   clinic: { icon: faClinicMedical, color: '#27ae60' },
   pharmacy: { icon: faPrescriptionBottleAlt, color: '#f39c12' }
+};
+
+// Mock API service for doctors data
+const mockDoctorService = {
+  getDoctorsByFacility: async (facilityId, facilityType) => {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    const specialties = {
+      hospital: ["Cardiology", "Pediatrics", "Orthopedics", "Neurology", "General Surgery"],
+      clinic: ["General Medicine", "Dermatology", "ENT", "Gynecology", "Psychiatry"],
+      pharmacy: ["Pharmacist", "Medication Consultation"]
+    };
+    
+    const names = ["Kumar", "Sharma", "Patel", "Reddy", "Singh", "Verma", "Gupta"];
+    
+    const count = facilityType === 'pharmacy' ? 1 : Math.floor(Math.random() * 3) + 2;
+    
+    return {
+      doctors: Array(count).fill(0).map((_, i) => {
+        const firstName = ["Rajesh", "Priya", "Amit", "Sunita", "Vikram", "Anjali"][Math.floor(Math.random() * 6)];
+        const lastName = names[Math.floor(Math.random() * names.length)];
+        const specialty = specialties[facilityType][Math.floor(Math.random() * specialties[facilityType].length)];
+        
+        return {
+          id: `doc-${facilityId}-${i}`,
+          name: `Dr. ${firstName} ${lastName}`,
+          specialty,
+          available: Math.random() > 0.3,
+          nextAvailable: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleString()
+        };
+      })
+    };
+  }
 };
 
 const UserLocationMarker = ({ coords }) => {
@@ -44,7 +62,7 @@ const UserLocationMarker = ({ coords }) => {
     const marker = L.marker([coords.lat, coords.lon], {
       icon: L.divIcon({
         className: 'user-location-marker',
-        html: `<div style="background-color: #4285F4; width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;"><i class="fas fa-user"></i></div>`,
+        html: `<div><i class="fas fa-user"></i></div>`,
         iconSize: [30, 30]
       })
     }).addTo(map).bindPopup("Your Current Location").openPopup();
@@ -68,15 +86,15 @@ const UserLocationMarker = ({ coords }) => {
 };
 
 const FacilityMarkers = ({ facilities, userCoords }) => {
-  return facilities.map((facility, index) => {
+  return facilities.map((facility) => {
     const icon = facilityIcons[facility.type];
     return (
       <Marker
-        key={index}
+        key={facility.id}
         position={[facility.lat, facility.lon]}
         icon={L.divIcon({
           className: 'facility-marker',
-          html: `<div style="background-color: ${icon.color}; width: 30px; height: 30px; border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px;"><i class="fas ${icon.icon}"></i></div>`,
+          html: `<div style="background-color: ${icon.color};"><i class="fas ${icon.icon}"></i></div>`,
           iconSize: [34, 34]
         })}
       >
@@ -87,55 +105,83 @@ const FacilityMarkers = ({ facilities, userCoords }) => {
           {facility.address && `Address: ${facility.address}<br />`}
           {facility.phone !== "Not available" && `Phone: ${facility.phone}<br />`}
           Distance: {facility.distance} km<br />
-          <a href={`https://www.openstreetmap.org/?mlat=${facility.lat}&mlon=${facility.lon}#map=18/${facility.lat}/${facility.lon}`} target="_blank" rel="noopener noreferrer">View on OSM</a><br />
-          <a href="#" onClick={(e) => {
-            e.preventDefault();
-            window.open(`https://www.openstreetmap.org/directions?engine=osrm_car&route=${userCoords.lat},${userCoords.lon};${facility.lat},${facility.lon}#map=15/${userCoords.lat}/${userCoords.lon}`);
-          }}>Get Directions</a>
+          <a href={`https://www.openstreetmap.org/?mlat=${facility.lat}&mlon=${facility.lon}#map=18/${facility.lat}/${facility.lon}`} 
+             target="_blank" 
+             rel="noopener noreferrer">
+            View on Map
+          </a>
         </Popup>
       </Marker>
     );
   });
 };
 
-const FacilityItem = ({ facility, userCoords, onBookAppointment }) => {
-  const icon = facilityIcons[facility.type];
-  const doctors = sampleDoctors[facility.type] || [];
+const FacilityCard = ({ facility, userCoords, onBookAppointment }) => {
+  const [doctors, setDoctors] = useState([]);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
+
+  useEffect(() => {
+    const loadDoctors = async () => {
+      setLoadingDoctors(true);
+      try {
+        const response = await mockDoctorService.getDoctorsByFacility(facility.id, facility.type);
+        setDoctors(response.doctors);
+      } catch (error) {
+        console.error("Error loading doctors:", error);
+        setDoctors([]);
+      } finally {
+        setLoadingDoctors(false);
+      }
+    };
+
+    loadDoctors();
+  }, [facility.id, facility.type]);
 
   return (
-    <div className="facility-item">
-      <div className={`facility-type ${facility.type}-type`}>
-        {facility.type.charAt(0).toUpperCase() + facility.type.slice(1)}
-      </div>
-      <h3>{facility.name}</h3>
-      {facility.address && (
-        <div className="meta-item">
-          <FontAwesomeIcon icon={faMapMarkerAlt} /> {facility.address}
+    <div className="facility-card">
+      <div className="facility-header">
+        <div className={`facility-type ${facility.type}-type`}>
+          {facility.type.charAt(0).toUpperCase() + facility.type.slice(1)}
         </div>
-      )}
-      {facility.phone !== "Not available" && (
-        <div className="meta-item">
-          <FontAwesomeIcon icon={faPhone} /> {facility.phone}
-        </div>
-      )}
-      <div className="meta-item">
-        <FontAwesomeIcon icon={faRoute} /> 
-        <span className="distance">{facility.distance} km away</span>
+        <h3>{facility.name}</h3>
       </div>
+
+      <div className="facility-meta">
+        {facility.address && (
+          <div className="meta-item">
+            <FontAwesomeIcon icon={faMapMarkerAlt} /> {facility.address}
+          </div>
+        )}
+        {facility.phone !== "Not available" && (
+          <div className="meta-item">
+            <FontAwesomeIcon icon={faPhone} /> {facility.phone}
+          </div>
+        )}
+        <div className="meta-item">
+          <FontAwesomeIcon icon={faRoute} /> 
+          <span>{facility.distance} km away</span>
+        </div>
+      </div>
+
       {facility.specialization && (
-        <div style={{ margin: '15px 0' }}>
+        <div className="specialization-tags">
           {facility.specialization.split(',').map((s, i) => (
             <span key={i} className="specialization-tag">{s.trim()}</span>
           ))}
         </div>
       )}
-      {doctors.length > 0 && (
+
+      {loadingDoctors ? (
+        <div className="loading-doctors">
+          <FontAwesomeIcon icon={faSpinner} spin /> Loading doctor information...
+        </div>
+      ) : doctors.length > 0 ? (
         <div className="doctors-list">
           <h4>Available Doctors:</h4>
           {doctors.map(doctor => (
-            <div key={doctor.id} className="doctor-item">
+            <div key={doctor.id} className="doctor-card">
               <div className="doctor-avatar">
-                {doctor.name.split(' ').map(n => n[0]).join('')}
+                {doctor.name.split(' ').slice(1).map(n => n[0]).join('')}
               </div>
               <div className="doctor-info">
                 <div className="doctor-name">{doctor.name}</div>
@@ -146,7 +192,7 @@ const FacilityItem = ({ facility, userCoords, onBookAppointment }) => {
               </div>
               {doctor.available && (
                 <button 
-                  className="appointment-btn" 
+                  className="action-btn book-btn" 
                   onClick={() => onBookAppointment(doctor.id, facility.name, doctor.name)}
                 >
                   <FontAwesomeIcon icon={faCalendarPlus} /> Book
@@ -155,18 +201,26 @@ const FacilityItem = ({ facility, userCoords, onBookAppointment }) => {
             </div>
           ))}
         </div>
+      ) : (
+        <div className="no-doctors">No doctor information available</div>
       )}
+
       <div className="action-buttons">
-        {doctors.length > 0 && (
+        {doctors.length > 0 && doctors.some(d => d.available) && (
           <button 
-            className="appointment-btn"
-            onClick={() => onBookAppointment(doctors[0].id, facility.name, doctors[0].name)}
+            className="action-btn book-btn"
+            onClick={() => {
+              const availableDoctor = doctors.find(d => d.available);
+              if (availableDoctor) {
+                onBookAppointment(availableDoctor.id, facility.name, availableDoctor.name);
+              }
+            }}
           >
             <FontAwesomeIcon icon={faCalendarPlus} /> Book Appointment
           </button>
         )}
         <button 
-          className="directions-btn"
+          className="action-btn directions-btn"
           onClick={() => window.open(`https://www.openstreetmap.org/directions?engine=osrm_car&route=${userCoords.lat},${userCoords.lon};${facility.lat},${facility.lon}#map=15/${userCoords.lat}/${userCoords.lon}`)}
         >
           <FontAwesomeIcon icon={faDirections} /> Get Directions
@@ -196,7 +250,8 @@ const AppointmentModal = ({ isOpen, onClose, doctorId, facilityName, doctorName 
     console.log('Appointment booked:', {
       ...formData,
       doctorId,
-      facilityName
+      facilityName,
+      doctorName
     });
     alert(`Appointment booked successfully with ${doctorName} at ${facilityName}!\n\nWe'll contact you shortly at ${formData.patientPhone} to confirm.`);
     setFormData({
@@ -429,7 +484,7 @@ const App = () => {
 
       const processedFacilities = data.elements
         .filter(el => el.lat || el.center?.lat)
-        .map(el => {
+        .map((el, index) => {
           const lat = el.lat || el.center?.lat;
           const lon = el.lon || el.center?.lon;
           const name = el.tags?.name || "Unnamed Facility";
@@ -459,6 +514,7 @@ const App = () => {
           ].filter(Boolean).join(", ");
           
           return {
+            id: el.id || `facility-${index}-${Date.now()}`,
             lat, lon, name, specialization,
             type, tags: el.tags,
             distance, phone, address
@@ -512,84 +568,91 @@ const App = () => {
 
   return (
     <div className="container">
-      <h1><FontAwesomeIcon icon={faHospital} /> Medical Facility Finder</h1>
-      <h2>Find Hospitals, Clinics & Pharmacies with Doctor Availability</h2>
-      
-      <div className="search-box">
-        <input 
-          type="text" 
-          id="locationInput" 
-          placeholder="Enter location (e.g. Hyderabad)" 
-          value={locationInput}
-          onChange={(e) => setLocationInput(e.target.value)}
-          autoComplete="off"
-        />
-        <select 
-          id="facilityType" 
-          value={facilityType}
-          onChange={(e) => setFacilityType(e.target.value)}
-        >
-          <option value="all">All Facilities</option>
-          <option value="hospital">Hospitals</option>
-          <option value="clinic">Clinics</option>
-          <option value="pharmacy">Pharmacies</option>
-        </select>
-        <select 
-          id="specialization" 
-          value={specialization}
-          onChange={(e) => setSpecialization(e.target.value)}
-        >
-          <option value="all">All Specializations</option>
-          <option value="emergency">Emergency</option>
-          <option value="general">General Medicine</option>
-          <option value="dentistry">Dentistry</option>
-          <option value="dermatology">Dermatology</option>
-          <option value="cardiology">Cardiology</option>
-          <option value="pediatrics">Pediatrics</option>
-          <option value="orthopedics">Orthopedics</option>
-          <option value="neurology">Neurology</option>
-          <option value="gynaecology">Gynaecology</option>
-          <option value="psychiatry">Psychiatry</option>
-        </select>
-        <button onClick={() => searchFacilities()}>
-          <FontAwesomeIcon icon={faSearch} /> Search
-        </button>
-        <button onClick={locateUser}>
-          <FontAwesomeIcon icon={faLocationArrow} /> My Location
-        </button>
-        {isLoading && (
-          <span id="loading">
-            <FontAwesomeIcon icon={faSpinner} spin /> Loading...
-          </span>
-        )}
-        {error && <div id="error">{error}</div>}
+      <div className="header">
+        <h1><FontAwesomeIcon icon={faHospital} /> Medical Facility Finder</h1>
+        <h2>Find Hospitals, Clinics & Pharmacies with Doctor Availability</h2>
       </div>
       
-      <MapContainer 
-        center={[17.385044, 78.486671]} 
-        zoom={13} 
-        style={{ height: '500px', width: '100%', margin: '25px 0', borderRadius: '10px' }}
-        whenCreated={map => { mapRef.current = map; }}
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        {userCoords && <UserLocationMarker coords={userCoords} />}
-        <FacilityMarkers facilities={paginatedItems} userCoords={userCoords || { lat: 17.385044, lon: 78.486671 }} />
-      </MapContainer>
+      <div className="search-section">
+        <div className="search-controls">
+          <div className="search-row">
+            <input 
+              type="text" 
+              placeholder="Enter location (e.g. Hyderabad)" 
+              value={locationInput}
+              onChange={(e) => setLocationInput(e.target.value)}
+              autoComplete="off"
+            />
+            <select 
+              value={facilityType}
+              onChange={(e) => setFacilityType(e.target.value)}
+            >
+              <option value="all">All Facilities</option>
+              <option value="hospital">Hospitals</option>
+              <option value="clinic">Clinics</option>
+              <option value="pharmacy">Pharmacies</option>
+            </select>
+            <select 
+              value={specialization}
+              onChange={(e) => setSpecialization(e.target.value)}
+            >
+              <option value="all">All Specializations</option>
+              <option value="emergency">Emergency</option>
+              <option value="general">General Medicine</option>
+              <option value="dentistry">Dentistry</option>
+              <option value="dermatology">Dermatology</option>
+              <option value="cardiology">Cardiology</option>
+              <option value="pediatrics">Pediatrics</option>
+              <option value="orthopedics">Orthopedics</option>
+              <option value="neurology">Neurology</option>
+              <option value="gynaecology">Gynaecology</option>
+              <option value="psychiatry">Psychiatry</option>
+            </select>
+          </div>
+          <div className="search-buttons">
+            <button onClick={() => searchFacilities()}>
+              <FontAwesomeIcon icon={faSearch} /> Search
+            </button>
+            <button onClick={locateUser}>
+              <FontAwesomeIcon icon={faLocationArrow} /> My Location
+            </button>
+          </div>
+        </div>
+        {isLoading && (
+          <div className="loading">
+            <FontAwesomeIcon icon={faSpinner} spin /> Loading...
+          </div>
+        )}
+        {error && <div className="error">{error}</div>}
+      </div>
       
-      <div id="facilityList">
+      <div className="map-container">
+        <MapContainer 
+          center={userCoords || [17.385044, 78.486671]} 
+          zoom={13}
+          style={{ height: '100%', width: '100%' }}
+          whenCreated={map => { mapRef.current = map; }}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          {userCoords && <UserLocationMarker coords={userCoords} />}
+          <FacilityMarkers facilities={paginatedItems} userCoords={userCoords || { lat: 17.385044, lon: 78.486671 }} />
+        </MapContainer>
+      </div>
+      
+      <div className="results-section">
         {filteredFacilities.length === 0 ? (
           <div className="no-results">
-            <FontAwesomeIcon icon={faHospital} style={{ fontSize: '48px', color: '#bdc3c7', marginBottom: '15px' }} />
+            <FontAwesomeIcon icon={faHospital} />
             <h3>No medical facilities found</h3>
             <p>Try adjusting your search filters or expanding the search radius</p>
           </div>
         ) : (
-          paginatedItems.map((facility, index) => (
-            <FacilityItem 
-              key={index} 
+          paginatedItems.map((facility) => (
+            <FacilityCard 
+              key={facility.id}
               facility={facility} 
               userCoords={userCoords || { lat: 17.385044, lon: 78.486671 }}
               onBookAppointment={openAppointmentModal}
@@ -602,18 +665,16 @@ const App = () => {
         <div className="pagination">
           <button 
             className="page-btn" 
-            id="prevPage" 
             disabled={currentPage <= 1}
             onClick={() => setCurrentPage(prev => prev - 1)}
           >
             <FontAwesomeIcon icon={faChevronLeft} /> Previous
           </button>
-          <span className="page-info" id="pageInfo">
+          <span className="page-info">
             Page {currentPage} of {totalPages} ({startIndex + 1}-{Math.min(endIndex, filteredFacilities.length)} of {filteredFacilities.length})
           </span>
           <button 
             className="page-btn" 
-            id="nextPage" 
             disabled={currentPage >= totalPages}
             onClick={() => setCurrentPage(prev => prev + 1)}
           >

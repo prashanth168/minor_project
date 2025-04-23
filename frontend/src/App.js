@@ -10,9 +10,11 @@ import Dashboard from './Components/Dashboard';
 import Symptom from './SymptomChecker/Symptom';
 import UploadForm from './Components/UploadForm';
 import Profile from './Components/Profile';
-import DoctorsMapPage from './Components/DoctorsMapPage';
+import DoctorList from './Components/DoctorList'
+
 import Chatbot from './Chatbot/Chatbot';
 import Map from './map/map';
+import './App.css';
 
 function App() {
   let Router=createBrowserRouter([
@@ -66,12 +68,12 @@ function App() {
       element:<UploadForm/>
     },
     {
-      path:'/hospital-finder',
-      element:<DoctorsMapPage/>
-    },
-    {
       path:'/maps',
       element:<Map/>
+    },
+    {
+      path:'/hosptial-finder',
+      element:<DoctorList/>
     }
   ])
   return (

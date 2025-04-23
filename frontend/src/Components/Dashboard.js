@@ -25,13 +25,13 @@ function Dashboard() {
     {
       title: 'Hospital Finder',
       description: 'Search hospitals near you based on affordability, specialization, and compatibility.',
-      route: '/hospital-finder',
+      route: '/maps',
       icon: <FaHospital size={40} color="#FFC107" />,
     },
     {
       title: 'Appointments',
-      description: 'Book and manage appointments with AI-recommended doctors.',
-      // route: '/appointments',
+      description: 'Book and manage appointments with recommended doctors.',
+      route: '/hosptial-finder',
       icon: <FaCalendarCheck size={40} color="#DC3545" />,
     },
   ];

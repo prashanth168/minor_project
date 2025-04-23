@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../Components/userSlice'; // adjust path if needed
+import toast, { Toaster } from 'react-hot-toast';
 
 function Login() {
   const { register, handleSubmit } = useForm();
@@ -16,7 +17,7 @@ function Login() {
 
   const onLoginSubmit = async (userObj) => {
     if (!userRole) {
-      alert('Please select a role before logging in.');
+      toast.error('Please select a role before logging in.');
       return;
     }
 
@@ -28,13 +29,12 @@ function Login() {
         },
         body: JSON.stringify({ ...userObj, role: userRole }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
-        alert(`Login successful as ${userRole}!`);
-        
-        // Store user data in Redux
+        toast.success(`Login successful as ${userRole}!`);
+
         dispatch(setUser({
           _id: data._id,
           email: data.email,
@@ -47,20 +47,22 @@ function Login() {
           experience: data.experience,
           token: data.token
         }));
-  
-        console.log("User data after dispatch:", data);  // <-- Check this in the console
-  
-        navigate('/dashboard');
+
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1000); 
       } else {
-        alert(`Login failed: ${data.message}`);
+        toast.error(`Login failed: ${data.message}`);
       }
     } catch (error) {
       console.error('Login error:', error);
-      alert('Something went wrong. Please try again later.');
+      toast.error('Something went wrong. Please try again later.');
     }
   };
+
   return (
     <div className='container mt-5'>
+      <Toaster position="top-center" reverseOrder={false} />
       <div className='card shadow-lg p-4' style={{ maxWidth: '500px', margin: 'auto', borderRadius: '20px' }}>
         <h3 className='text-center mb-4 text-primary'>Login</h3>
 

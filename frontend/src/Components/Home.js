@@ -3,6 +3,7 @@ import Navibar from './Navibar';
 import Footer from './Footer';
 import { Outlet } from 'react-router-dom';
 
+
 function Home() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>

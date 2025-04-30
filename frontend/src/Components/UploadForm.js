@@ -65,7 +65,6 @@ const UploadForm = () => {
             </label>
           </div>
 
-
           {previewUrl && (
             <div className="image-preview">
               <h2>Uploaded Image:</h2>
@@ -73,7 +72,7 @@ const UploadForm = () => {
             </div>
           )}
 
-          <br/>
+          <br />
 
           <button type="submit" className="submit-button" disabled={loading}>
             {loading ? 'Uploading...' : 'Upload Image'}
@@ -89,6 +88,14 @@ const UploadForm = () => {
               {predictions.map((prediction, index) => (
                 <li key={index}>
                   <strong>{prediction.class}</strong>: {prediction.confidence.toFixed(2)}%
+                  <br />
+                  <em>Description:</em> {prediction.description}
+                  <br />
+                  <em>Symptoms:</em> {prediction.symptoms}
+                  <br />
+                  <em>Treatment Options:</em> {prediction.treatment_options}
+                  <br />
+                  <em>Precautions:</em> {prediction.precautions}
                 </li>
               ))}
             </ul>
